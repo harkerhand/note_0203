@@ -266,75 +266,38 @@ dp[v][m - B(v)] = \min(dp[v][m - B(v)], dp[u][m] + A(u, v))
 
 ### **代码实现**
 ```cpp
-#include <iostream>
-#include <vector>
-#include <limits>
+int getMinPathDist(int n, vector<vector<Edge>> &graph, vector<int> &cost, int M, int s, int d)
+{
+    vector<vector<int>> dp(n, vector<int>(M + 1, INT_MAX));
 
-using namespace std;
-
-const int INF = numeric_limits<int>::max();
-
-struct Edge {
-    int to, length;
-};
-
-// 动态规划求解受限最短路径
-int dpShortestPath(int n, vector<vector<Edge>>& graph, vector<int>& cost, int M, int s, int d) {
-    vector<vector<int>> dp(n, vector<int>(M + 1, INF));
-
-    // 初始化：从 s 出发，支付过路费 B(s)
-    if (M >= cost[s]) {
+    if (M >= cost[s])
         dp[s][M - cost[s]] = 0;
-    }
 
-    // 状态转移
-    for (int money = M; money >= 0; --money) {  // 遍历每种剩余金钱
-        for (int u = 0; u < n; ++u) {           // 遍历所有顶点
-            if (dp[u][money] == INF) continue;  // 不可达的状态跳过
-
-            for (const Edge& edge : graph[u]) {  // 遍历所有邻居
-                int v = edge.to, length = edge.length;
-                if (money >= cost[v]) {  // 必须满足花费条件
-                    int newMoney = money - cost[v];
-                    dp[v][newMoney] = min(dp[v][newMoney], dp[u][money] + length);
+    for (int money = M; money >= 0; --money)
+    {
+        for (int u = 0; u < n; ++u)
+        {
+            if (dp[u][money] == INT_MAX)
+                continue;
+            for (const Edge &edge : graph[u])
+            {
+                int v = edge.to;
+                int w = edge.length;
+                if (money >= cost[v])
+                {
+                    int newMony = money - cost[v];
+                    dp[v][newMony] = min(dp[v][newMony], dp[u][money] + w);
                 }
             }
         }
     }
 
-    // 计算最小的 dp[d][m]
-    int minDist = INF;
-    for (int m = 0; m <= M; ++m) {
-        minDist = min(minDist, dp[d][m]);
+    int minDist = INT_MAX;
+    for (int money = 0; money <= M; ++money)
+    {
+        minDist = min(minDist, dp[d][money]);
     }
-
-    return (minDist == INF) ? -1 : minDist;  // 无法到达返回 -1
-}
-
-// 测试代码
-int main() {
-    int n = 5, M = 10, s = 0, d = 4;
-    vector<vector<Edge>> graph(n);
-    vector<int> cost = {2, 3, 5, 1, 4}; // 顶点过路费
-
-    // 添加边
-    graph[0].push_back({1, 4});
-    graph[1].push_back({0, 4});
-    graph[1].push_back({2, 2});
-    graph[2].push_back({1, 2});
-    graph[2].push_back({3, 3});
-    graph[3].push_back({2, 3});
-    graph[3].push_back({4, 2});
-    graph[4].push_back({3, 2});
-
-    int result = dpShortestPath(n, graph, cost, M, s, d);
-
-    if (result != -1)
-        cout << "最短路径长度: " << result << endl;
-    else
-        cout << "无法到达终点" << endl;
-
-    return 0;
+    return minDist;
 }
 ```
 
