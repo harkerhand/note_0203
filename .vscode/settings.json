@@ -1,0 +1,8 @@
+{
+    "code-runner.executorMap": {
+        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt.exe -std=c++23 && $dir$fileNameWithoutExt.exe",
+    },
+    "files.associations": {
+        "ostream": "cpp"
+    }
+}
