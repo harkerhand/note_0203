@@ -1,0 +1,166 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{ctex} % 中文支持
+\usepackage{listings} % 代码排版
+\usepackage{xcolor}
+\usepackage{graphicx} % 插入图片
+\usepackage{geometry} % 页面设置
+\usepackage{caption} % 图片标题
+
+\geometry{margin=2.5cm}
+
+% 代码风格设置
+\lstset{
+    language=Python, % 可以根据需要改成 C++, Java 等
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single
+}
+
+\title{人工智能概论第二次实验报告}
+\author{09023321 \ 巩皓锴}
+
+
+\begin{document}
+
+\maketitle
+
+\section{实验内容}
+    使用 A* 算法求解24数码问题
+
+\section{实验代码}
+
+\begin{lstlisting}[language=Python, caption=A*算法代码示例]
+    import heapq
+    # 定义曼哈顿距离启发函数
+    def manhattan_distance(state, goal):
+        distance = 0
+        # 创建数字位置映射表
+        goal_positions = {}
+        for i in range(5):
+            for j in range(5):
+                goal_positions[goal[i][j]] = (i, j)
+        
+        # 计算每个数字的曼哈顿距离之和
+        for i in range(5):
+            for j in range(5):
+                if state[i][j] != 0:  # 跳过空白格
+                    goal_i, goal_j = goal_positions[state[i][j]]
+                    distance += abs(i - goal_i) + abs(j - goal_j)
+        return distance
+    
+    # 定义方向移动
+    directions = {
+        'UP': (-1, 0),
+        'DOWN': (1, 0),
+        'LEFT': (0, -1),
+        'RIGHT': (0, 1)
+    }
+    
+    # 查找空白格位置
+    def find_blank(state):
+        for i in range(5):
+            for j in range(5):
+                if state[i][j] == 0:
+                    return i, j
+        return -1, -1
+    
+    # 生成下一个状态
+    def get_next_states(state, blank_x, blank_y):
+        next_states = []
+        for dir_name, (dx, dy) in directions.items():
+            new_x, new_y = blank_x + dx, blank_y + dy
+            if 0 <= new_x < 5 and 0 <= new_y < 5:
+                new_state = copy.deepcopy(state)
+                new_state[blank_x][blank_y], new_state[new_x][new_y] = new_state[new_x][new_y], new_state[blank_x][blank_y]
+                next_states.append((new_state, dir_name, (new_x, new_y)))
+        return next_states
+    
+    # 将状态转为元组，便于哈希
+    def state_to_tuple(state):
+        return tuple(tuple(row) for row in state)
+    
+    # 开始A*搜索
+    start_blank_x, start_blank_y = find_blank(start_state)
+    initial_h = manhattan_distance(start_state, goal_state)
+    
+    # 优先队列(f值, g值, 状态, 空白格坐标, 路径)
+    open_list = [(initial_h, 0, start_state, (start_blank_x, start_blank_y), [])]
+    closed_set = set()  # 已访问状态集合
+    
+    while open_list:
+        # 取出f值最小的状态
+        f, g, current_state, (blank_x, blank_y), path = heapq.heappop(open_list)
+        
+        # 状态转元组用于哈希检查
+        state_tuple = state_to_tuple(current_state)
+        
+        # 如果是目标状态，返回路径
+        if state_tuple == state_to_tuple(goal_state):
+            return path
+        
+        # 如果已经访问过此状态，则跳过
+        if state_tuple in closed_set:
+            continue
+        
+        # 标记为已访问
+        closed_set.add(state_tuple)
+        
+        # 生成所有可能的下一步状态
+        for next_state, direction, (new_blank_x, new_blank_y) in get_next_states(current_state, blank_x, blank_y):
+            next_state_tuple = state_to_tuple(next_state)
+            
+            # 如果该状态已访问过，则跳过
+            if next_state_tuple in closed_set:
+                continue
+            
+            # 计算新的g值和h值
+            new_g = g + 1
+            new_h = manhattan_distance(next_state, goal_state)
+            new_f = new_g + new_h
+            
+            # 添加到开放列表
+            heapq.heappush(open_list, (new_f, new_g, next_state, (new_blank_x, new_blank_y), path + [direction]))
+    
+    # 如果无解，返回空列表
+    return moves
+\end{lstlisting}
+
+
+\section{实验结果}
+\subsection{运行结果}
+
+\begin{lstlisting}
+    生成的初始状态：
+[' 1', ' 2', ' 3', ' 4', ' 5']
+['11', '13', ' 6', ' 8', '10']
+[' 0', '12', ' 7', ' 9', '15']
+['16', '17', '18', '24', '19']
+['21', '22', '23', '20', '14']
+
+可解性验证: 通过
+
+参考解步数: 30
+参考解: ['LEFT', 'LEFT', 'DOWN', 'RIGHT', 'UP', 'LEFT', 'DOWN', 'RIGHT', 'UP', 'RIGHT', 'DOWN', 'LEFT', 'LEFT', 'LEFT', 'UP', 'LEFT', 'UP', 'RIGHT', 'UP', 'LEFT', 'DOWN', 'RIGHT', 'UP', 'LEFT', 'DOWN', 'DOWN', 'RIGHT', 'UP', 'LEFT', 'UP']
+
+运行A*算法验证...
+实际找到解（22步）
+解: ['RIGHT', 'UP', 'RIGHT', 'DOWN', 'LEFT', 'LEFT', 'UP', 'RIGHT', 'RIGHT', 'RIGHT', 'DOWN', 'RIGHT', 'DOWN', 'DOWN', 'LEFT', 'UP', 'RIGHT', 'UP', 'LEFT', 'DOWN', 'RIGHT', 'DOWN']
+\end{lstlisting}
+
+\subsection{结果分析}
+A* 算法能够有效求解本实验中的24数码问题，并能在合理时间内找到相对较优的解。
+解路径与步数均优于参考解，显示了该算法良好的性能。
+
+
+\section*{四、实验分析}
+
+本实验采用 A\* 算法求解24数码问题。A\* 算法的核心思想是结合实际代价 (g 值) 和预估代价 (h 值) 进行优先搜索，保证搜索路径既高效又接近最优。实验中，启发函数采用的是每个数字块到目标位置的曼哈顿距离之和，有效引导搜索方向。
+
+搜索过程中，每一步选择当前代价最小的状态扩展，避免盲目遍历所有可能。通过合理设计启发函数，最终找到 22 步的解，比参考解更优，验证了 A\* 算法在本问题中的高效性。
+
+\end{document}
