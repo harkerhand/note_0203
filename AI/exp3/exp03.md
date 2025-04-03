@@ -80,7 +80,7 @@ class MultiHeadedAttention(nn.Module):
 
 ## 实验结果
 
-**模型训练 5*300 评估如下**：
+**模型训练评估如下**：
 
 ```text
 >>>>> Evaluate
@@ -95,7 +95,7 @@ class MultiHeadedAttention(nn.Module):
 <<<<< Evaluate loss: 0.931070
 ```
 
-在训练过程中，模型的损失逐渐减小，说明模型在学习。符合预期 ^_^
+在训练过程中，模型的损失逐渐减小，说明模型在学习。符合预期 \^_\^
 
 **推理验证输入：**
 
