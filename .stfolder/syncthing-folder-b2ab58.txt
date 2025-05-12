@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: pcj4h-zrarr
+created: 2025-05-12T14:52:41+08:00
