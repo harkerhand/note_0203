@@ -1,8 +1,0 @@
-save/model.pt
-__pycache__/
-
-*.pdf
-
-log/*
-
-*.pt
