@@ -2,9 +2,11 @@
 using namespace std;
 #define int long long
 
-double dis(pair<int, int> a, pair<int, int> b)
+inline double dis(const pair<int, int> &a, const pair<int, int> &b)
 {
-    return (a.first - b.first) * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
+    int dx = a.first - b.first;
+    int dy = a.second - b.second;
+    return dx * dx + dy * dy;
 }
 
 double divide(vector<pair<int, int>> &a, int l, int r)
@@ -19,6 +21,7 @@ double divide(vector<pair<int, int>> &a, int l, int r)
     double d2 = divide(a, mid + 1, r);
     double mn = min(d1, d2);
 
+    // 构造临界区
     vector<pair<int, int>> b;
     for (int i = l; i <= r; i++)
     {
@@ -30,6 +33,7 @@ double divide(vector<pair<int, int>> &a, int l, int r)
     sort(b.begin(), b.end(), [](pair<int, int> &a, pair<int, int> &b)
          { return a.second >= b.second; });
 
+    // 在临界区内寻找最小距离
     for (int i = 0; i < b.size(); i++)
     {
         for (int j = 1; j < 7 && i + j < b.size(); j++)
@@ -49,7 +53,7 @@ void solve()
         cin >> a[i].first >> a[i].second;
     sort(a.begin(), a.end(), [](pair<int, int> &a, pair<int, int> &b)
          { return a.first == b.first ? a.second >= b.second : a.first >= b.first; });
-    printf("%.2lf\n", sqrt(divide(a, 0, n - 1)));
+    cout << fixed << setprecision(2) << sqrt(divide(a, 0, n - 1)) << endl;
 }
 
 signed main()

@@ -52,12 +52,22 @@ vector<int> getLongest(vector<int> a)
     return {};
 }
 
-void erase_vector(vector<int> &a, const vector<int> to_erase)
+void erase_vector(vector<int> &a, const vector<int> &to_erase)
 {
-    for (auto x : to_erase)
+    unordered_multiset<int> s(to_erase.begin(), to_erase.end());
+    vector<int> result;
+    for (int x : a)
     {
-        a.erase(find(a.begin(), a.end(), x));
+        if (s.count(x))
+        {
+            s.erase(s.find(x));
+        }
+        else
+        {
+            result.push_back(x);
+        }
     }
+    a = result;
 }
 
 signed main()

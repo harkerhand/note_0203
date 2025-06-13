@@ -4,30 +4,33 @@ using namespace std;
 
 signed main()
 {
-    int t;
-    cin >> t;
-    while (t--)
+    int M;
+    cin >> M;
+    while (M--)
     {
-        int n;
-        int k;
-        cin >> n >> k;
-        string s;
-        cin >> s;
-        vector<vector<int>> dp(n + 1, vector<int>(k + 1, 0));
-        for (int i = 1; i <= n; i++)
+        int N, K;
+        cin >> N >> K;
+        string number;
+        cin >> number;
+        // dp[i][k] 表示前 i 位数字分成 k + 1 组的最大乘积
+        vector<vector<int>> dp(N + 1, vector<int>(K + 1, 0));
+        for (int i = 1; i <= N; i++)
         {
-            dp[i][0] = stoll(s.substr(0, i));
+            dp[i][0] = stoll(number.substr(0, i)); // 前 i 位数字作为一组
         }
-        for (int K = 1; K <= k; K++)
+        // 枚举分组数 K
+        for (int k = 1; k <= K; k++)
         {
-            for (int i = K + 1; i <= n; i++)
+            // 枚举前 i 位数字
+            for (int i = k + 1; i <= N; i++)
             {
-                for (int j = K; j < i; j++)
+                // 枚举切分点 j
+                for (int j = k; j < i; j++)
                 {
-                    dp[i][K] = max(dp[i][K], dp[j][K - 1] * stoll(s.substr(j, i - j)));
+                    dp[i][k] = max(dp[i][k], dp[j][k - 1] * stoll(number.substr(j, i - j)));
                 }
             }
         }
-        cout << dp[n][k] << endl;
+        cout << dp[N][K] << endl; // 输出前 N 位数字分成 K + 1 组的最大乘积
     }
 }

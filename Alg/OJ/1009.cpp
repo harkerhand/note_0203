@@ -1,55 +1,37 @@
+/* 拦截导弹
+ * http://10.201.1.112/problem.php?id=1009
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 #define int long long
 
-vector<int> getLongest(vector<int> a)
+// 获取最长非增子序列
+int getLongest(vector<int> a)
 {
-    int t = a.size();
-    vector<vector<int>> dp(t + 1);
-    dp[1].push_back(a[0]);
-    // i: index
-    for (int i = 2; i <= t; i++)
+    int n = a.size();
+    map<int, int> dp; // dp[i] 表示以 i 结尾的最长非增子序列的长度
+    dp[a[0]] = 1;     // 初始化第一个元素
+    for (int i = 1; i < n; i++)
     {
-        int &the = a[i - 1];
-        // j: length
-        for (int j = t; j >= 1; j--)
+        int ans = 0;
+        for (auto it : dp)
         {
-            if (j == 1)
+            if (it.first >= a[i]) // 如果当前元素小于等于 dp 中的元素
             {
-                int dp2_back = dp[2].empty() ? LONG_LONG_MIN : dp[2].back();
-                if (the <= dp[1].back() && the >= dp2_back) // check replace
-                {
-                    auto tmp = dp[1];
-                    tmp.push_back(the);
-                    dp[2] = tmp;
-                }
-                dp[j] = {max(dp[j][0], the)};
-                continue;
+                ans = max(ans, it.second); // 更新最长非增子序列长度
             }
-            if (dp[j].size() == 0)
-                continue;
+        }
+        dp[a[i]] = ans + 1; // 更新以 a[i] 结尾的最长非增子序列长度
+    }
+    // 找到最长非增子序列的长度
+    int maxLength = 0;
+    for (auto it : dp)
+    {
+        maxLength = max(maxLength, it.second);
+    }
 
-            int dp2_back = dp[j + 1].empty() ? LONG_LONG_MIN : dp[j + 1].back();
-            if (j < t && the <= dp[j].back() && the >= dp2_back)
-            {
-                auto nw = dp[j];
-                nw.push_back(the);
-                dp[j + 1] = nw;
-            }
-            if (the >= dp[j].back() && the <= *(dp[j].end() - 2))
-            {
-                dp[j].back() = the;
-            }
-        }
-    }
-    for (int i = t; i >= 1; i--)
-    {
-        if (dp[i].size() > 0)
-        {
-            return dp[i];
-        }
-    }
-    return {};
+    return maxLength; // 返回最长非增子序列的长度
 }
 
 signed main()
@@ -64,6 +46,6 @@ signed main()
         for (auto &x : a)
             cin >> x;
         auto ans = getLongest(a);
-        cout << ans.size() << endl;
+        cout << ans << endl;
     }
 }
